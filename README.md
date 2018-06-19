@@ -1,1 +1,1 @@
-# test1
+# "Spend your scholarship!" project based on the Vue.js framework

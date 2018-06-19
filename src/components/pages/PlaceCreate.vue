@@ -1,0 +1,198 @@
+<template>
+    <main-layout>
+        <nav>
+            <div class="container">
+                <div class="nav">
+                    <div>
+                        <div class="nav__back">
+                            <router-link to="/" class="text-primary">&laquo; Вернуться к списку</router-link>
+                        </div>
+                        <h3 class="nav__title text-secondary">
+                            <template>Добавление места</template>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <main>
+            <div class="container">
+                <section>
+                    <div class="content">
+                        <form class="content__form">
+                            <label class="text-primary" for="name">Название:</label>
+                            <input v-model="place.name" type="text" name="name" id="name" placeholder="Введите название места">
+
+                            <label class="text-primary" for="address">Адрес:</label>
+                            <input v-model="place.address" type="text" name="address" id="address" placeholder="Введите точный адрес места">
+
+                            <label class="text-primary" for="average-check">Средний чек:</label>
+                            <input v-model="place.averageCheck" type="number" name="average_check" id="average-check"
+                                   placeholder="Введите размер среднего чека, руб." min="1" step="0.01">
+
+                            <label class="text-primary">Категория:</label>
+                            <select v-model="place.category">
+                                <option></option>
+                                <option v-for="category in categories" :value="{ id: category.id, name: category.name }">{{ category.name }}</option>
+                            </select>
+
+                            <label class="text-primary" for="photo">Фото:</label>
+                            <input type="text" name="photo_url"
+                                   value="http://img.all-mods.ru/2016/04/skyrim-bolshe-markerov-d"
+                                   disabled>
+                            <input type="file" name="photo" id="photo" accept="image/*">
+
+                            <img src="../../assets/images/photo.jpeg">
+
+                            <button class="text-primary" type="submit" @click.prevent="createPlace">Добавить</button>
+                        </form>
+                        <div class="content__map">
+                            <span class="content__map_title text-primary">Укажите место на карте:</span>
+                            <yandex-map
+                                class="content__map_body"
+                                :width="'816px'"
+                                :height="'100%'"
+                                :clickable="true"
+                                @map-clicked="addPlacemark"
+                                ref="map"
+                            >
+                            </yandex-map>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </main-layout>
+</template>
+
+<script>
+    import MainLayout from './layouts/Main.vue';
+    import YandexMap from '../Map';
+    import { mapGetters } from 'vuex';
+
+    export default {
+        components: {
+            MainLayout,
+            YandexMap
+        },
+        data() {
+            return {
+                place: {
+                    id: null,
+                    name: '',
+                    address: '',
+                    averageCheck: 0,
+                    category: {
+                        id: null,
+                        name: ''
+                    },
+                    coords: []
+                }
+            }
+        },
+        computed: {
+            ...mapGetters([
+                'categories',
+                'getNewPlaceId'
+            ])
+        },
+        methods: {
+            createPlace() {
+                this.place.id = this.getNewPlaceId;
+                this.$store.dispatch('createPlace', this.place);
+                this.$router.push('/');
+            },
+            addPlacemark(coords) {
+                this.place.coords = coords;
+                this.$refs.map.clearMap();
+                this.$refs.map.addPlacemark(this.place);
+            }
+        }
+    }
+</script>
+
+<style lang="scss" scoped>
+    nav {
+        border-bottom: 1px solid #BDBDBD;
+    }
+
+    select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background: url('../../assets/images/arrow-down.png') #fff 98% 50% no-repeat;
+        padding: 8px 15px 8px 16px;
+        margin-bottom: 24px;
+    }
+
+    .nav {
+        display: flex;
+        align-items: flex-start;
+        flex-direction: column;
+        height: 137px;
+        justify-content: space-evenly;
+    }
+
+    .nav__back {
+        position: relative;
+        left: -10px;
+        margin-bottom: 8px;
+    }
+
+    .content {
+        display: flex;
+        justify-content: space-between;
+        padding: 30px 0 30px 0;
+    }
+
+    .content__form {
+        display: flex;
+        flex-direction: column;
+        margin-right: 30px;
+        width: 400px;
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    input, select {
+        padding: 8px 15px 8px 16px;
+        margin-bottom: 24px;
+        font-family: 'Roboto', sans-serif;
+        font-size: 14px;
+    }
+
+    button {
+        padding: 10px;
+        color: #fff;
+        background: #0073E6;
+        border: none;
+        cursor: pointer;
+    }
+
+    img {
+        box-sizing: border-box;
+        width: 400px;
+        border: 1px solid #BDBDBD;
+        padding: 8px;
+        margin-bottom: 24px;
+    }
+
+    #photo {
+        display: none;
+    }
+    }
+
+    .content__map {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .content__map_title {
+        margin-bottom: 8px;
+    }
+
+    .content__map_body {
+        flex: 1;
+        border: 1px solid #E0E0E0;
+    }
+</style>
