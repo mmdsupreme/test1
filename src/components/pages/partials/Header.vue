@@ -24,7 +24,7 @@
                     return this.$store.getters.scholarship;
                 },
                 set(value) {
-                    this.$store.dispatch('setScholarship', value);
+                    this.$store.commit('setScholarship', value);
                 }
             }
         }

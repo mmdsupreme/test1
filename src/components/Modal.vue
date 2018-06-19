@@ -2,20 +2,28 @@
     <div class="modal-background">
         <div class="modal">
             <div class="modal-header">
-                <div>
-                    <slot name="header">
+                <div class="modal-container">
+                    <div>
+                        <slot name="header">
+                        </slot>
+                    </div>
+                    <button class="btn-close" @click.stop="close">&#x274c;</button>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <div class="modal-container">
+                    <slot name="body">
                     </slot>
                 </div>
-                <button class="btn-close" @click.stop="close">&#x274c;</button>
             </div>
-            <div class="modal-body">
-                <slot name="body">
-                </slot>
-            </div>
+
             <div class="modal-footer">
-                <slot name="footer">
-                </slot>
-                <button class="btn btn-cancel" @click.stop="close">Отмена</button>
+                <div class="modal-container">
+                    <slot name="footer">
+                    </slot>
+                    <button v-show="showCancelButton" class="btn btn-cancel" @click.stop="close">Отмена</button>
+                </div>
             </div>
         </div>
     </div>
@@ -23,6 +31,12 @@
 
 <script>
     export default {
+        props: {
+            showCancelButton: {
+                type: Boolean,
+                default: false
+            }
+        },
         methods: {
             close() {
                 this.$emit('close');
@@ -32,7 +46,17 @@
 </script>
 
 <style lang="scss" scoped>
+    .modal-container {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
     .modal-background {
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1;
         position: fixed;
         top: 0;
         bottom: 0;
@@ -44,53 +68,46 @@
     }
 
     .modal {
+        width: 464px;
         background: #fff;
-        box-shadow: 2px 2px 20px 1px;
+        box-shadow: none;
         overflow-x: auto;
         display: flex;
         flex-direction: column;
         font-family: 'Roboto', sans-serif;
     }
 
-    .modal-header,
     .modal-footer {
-        padding: 15px;
-        display: flex;
+        padding: 0 32px 32px 32px;
     }
-
     .modal-header {
-        background: #4296EA;
-        border-bottom: 1px solid #eeeeee;
-        color: #fff;
+        padding: 15px;
+        color: #333333;
         justify-content: space-between;
         align-items: baseline;
         font-family: 'Roboto Slab', serif;
-        font-size: 18px;
-    }
-
-    .modal-footer {
-        border-top: 1px solid #eeeeee;
-        justify-content: space-evenly;
+        font-size: 22px;
+        font-weight: bold;
     }
 
     .modal-body {
-        position: relative;
-        padding: 20px 10px;
+        padding: 0 0 20px 0;
     }
 
     .btn-close {
         border: none;
         padding: 5px 10px 5px 10px;
         cursor: pointer;
-        font-weight: bold;
-        color: #fff;
+        color: #BDBDBD;
         background: transparent;
     }
 
     .btn {
+        width: 192px;
+        height: 40px;
         color: white;
         border: none;
-        padding: 10px 20px 10px 20px;
+        padding: 8px 16px 8px 16px;
         cursor: pointer;
     }
 

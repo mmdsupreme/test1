@@ -1,5 +1,5 @@
 <template>
-    <modal v-show="isModalVisible" @close="closeModal">
+    <modal :showCancelButton="true" v-show="isModalVisible" @close="closeModal">
         <template slot="header">
             Удаление места
         </template>
