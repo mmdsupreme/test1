@@ -9,13 +9,29 @@ export default {
             4: 'islands#blueBarCircleIcon'
         }
     },
+    getters: {
+        map: state => {
+            return state.map;
+        },
+        getPlaceIconByCategoryId: state => categoryId => {
+            return state.placeCategoryMap[categoryId] ? state.placeCategoryMap[categoryId] : state.placeCategoryMap[0];
+        },
+        defaultPlaceIcon: state => {
+            return state.defaultPlaceIcon;
+        }
+    },
     mutations: {
-        setMap: (state) => {
-            if (state.map) {
-                return;
+        setMap(state, map) {
+            state.map = map;
+        },
+    },
+    actions: {
+        getMap(context) {
+            if (context.state.map) {
+                return context.state.map;
             }
 
-            state.map = new Promise((resolve, reject) => {
+            const ymaps = new Promise((resolve, reject) => {
                 const yandexMapScript = document.createElement('script');
                 const ymapSource = 'https://api-maps.yandex.ru/2.1/?lang=ru_RU';
 
@@ -29,32 +45,15 @@ export default {
                     });
                 };
 
-                yandexMapScript.onerror = (error) => reject(error);
+                yandexMapScript.onerror = (error) => {
+                    context.commit('setMap', null);
+                    reject(error);
+                };
             });
-        }
-    },
-    actions: {
-        getMap(context) {
-            context.commit('setMap');
 
-            return context.state.map.then(map => {
-                return new map.Map('map', {
-                    center: [54.314680, 48.395923],
-                    zoom: 12
-                });
-            }).catch(error => {
-                console.error('Error occurred while loading Yandex.Maps:', error);
+            context.commit('setMap', ymaps);
 
-                return error;
-            });
-        }
-    },
-    getters: {
-        getPlaceIconByCategoryId: state => categoryId => {
-            return state.placeCategoryMap[categoryId] ? state.placeCategoryMap[categoryId] : state.placeCategoryMap[0];
-        },
-        defaultPlaceIcon: state => {
-            return state.defaultPlaceIcon;
+            return ymaps;
         }
     }
 }

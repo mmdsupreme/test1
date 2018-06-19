@@ -40,22 +40,23 @@
                             <span class="text-primary-dark">{{ isFinite(percentOfScholarship) ? percentOfScholarship + '% стипендии' : 'нисколько' }}</span>
                         </div>
                         <div class="place-info__images">
-                            <img class="place-info__images_photo" src="../../assets/images/photo.jpeg">
+                            <img class="place-info__images_photo" :src="place && place.image">
                             <div class="place-info__images_map">
-                                <yandex-map :width="'400px'" :height="'400px'" :places="[place]" :center="place.coords" :zoom="15"></yandex-map>
+                                <yandex-map :width="'400px'" :height="'400px'" :places="[place]" :center="place && [place.lat, place.lon]" :zoom="15"></yandex-map>
                             </div>
                         </div>
                     </div>
                     <div class="place-reviews">
                         <div class="place-reviews__header">
                             <span class="text-primary-dark">Отзывы:</span>
-                            <button class="text-primary">Написать отзыв</button>
+                            <button @click.stop="$refs.modal.showModal()" class="text-primary">Написать отзыв</button>
                         </div>
-                        <div v-if="place && place.review" class="place-reviews__items">
-                            <review v-for="review in place.review" :review="review" :key="review.id"></review>
+                        <div v-if="place && place.reviews && place.reviews.length" class="place-reviews__items">
+                            <review v-for="review in place.reviews" :review="review" :key="review.id"></review>
                         </div>
                         <div class="text-secondary text-center" v-else>Отзывов пока нет. Оставьте свой!</div>
                     </div>
+                    <review-create :placeId="place && place.id" ref="modal"></review-create>
                 </div>
             </div>
         </main>
@@ -66,6 +67,7 @@
     import MainLayout from './layouts/Main.vue';
     import Rating from '../Rating.vue';
     import Review from '../Review.vue';
+    import ReviewCreate from '../ReviewCreate.vue';
     import YandexMap from '../Map.vue';
     import { mapGetters } from 'vuex';
 
@@ -74,6 +76,7 @@
             MainLayout,
             Rating,
             Review,
+            ReviewCreate,
             YandexMap
         },
         computed: {

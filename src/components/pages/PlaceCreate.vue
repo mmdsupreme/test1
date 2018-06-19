@@ -16,49 +16,45 @@
         </nav>
         <main>
             <div class="container">
-                <section>
-                    <div class="content">
-                        <form class="content__form">
-                            <label class="text-primary" for="name">Название:</label>
-                            <input v-model="place.name" type="text" name="name" id="name" placeholder="Введите название места">
+                <div class="content">
+                    <form class="content__form">
+                        <label class="text-primary" for="name">Название:</label>
+                        <input v-model="place.name" type="text" name="name" id="name" placeholder="Введите название места">
 
-                            <label class="text-primary" for="address">Адрес:</label>
-                            <input v-model="place.address" type="text" name="address" id="address" placeholder="Введите точный адрес места">
+                        <label class="text-primary" for="address">Адрес:</label>
+                        <input v-model="place.address" type="text" name="address" id="address" placeholder="Введите точный адрес места">
 
-                            <label class="text-primary" for="average-check">Средний чек:</label>
-                            <input v-model="place.averageCheck" type="number" name="average_check" id="average-check"
-                                   placeholder="Введите размер среднего чека, руб." min="1" step="0.01">
+                        <label class="text-primary" for="average-check">Средний чек:</label>
+                        <input v-model.number="place.averageCheck" type="number" name="average_check" id="average-check"
+                               placeholder="Введите размер среднего чека, руб." min="1" step="0.01">
 
-                            <label class="text-primary">Категория:</label>
-                            <select v-model="place.category">
-                                <option></option>
-                                <option v-for="category in categories" :value="{ id: category.id, name: category.name }">{{ category.name }}</option>
-                            </select>
+                        <label class="text-primary">Категория:</label>
+                        <select v-model="place.category">
+                            <option></option>
+                            <option v-for="category in categories" :value="{ id: category.id, name: category.name }">{{ category.name }}</option>
+                        </select>
 
-                            <label class="text-primary" for="photo">Фото:</label>
-                            <input type="text" name="photo_url"
-                                   value="http://img.all-mods.ru/2016/04/skyrim-bolshe-markerov-d"
-                                   disabled>
-                            <input type="file" name="photo" id="photo" accept="image/*">
+                        <label class="text-primary" for="photo">Фото:</label>
+                        <input v-model="place.image" type="text" name="photo_url">
+                        <input type="file" name="photo" id="photo" accept="image/*">
 
-                            <img src="../../assets/images/photo.jpeg">
+                        <img :src="place.image">
 
-                            <button class="text-primary" type="submit" @click.prevent="createPlace">Добавить</button>
-                        </form>
-                        <div class="content__map">
-                            <span class="content__map_title text-primary">Укажите место на карте:</span>
-                            <yandex-map
-                                class="content__map_body"
-                                :width="'816px'"
-                                :height="'100%'"
-                                :clickable="true"
-                                @map-clicked="addPlacemark"
-                                ref="map"
-                            >
-                            </yandex-map>
-                        </div>
+                        <button class="text-primary" type="submit" @click.prevent="createPlace">Добавить</button>
+                    </form>
+                    <div class="content__map">
+                        <span class="content__map_title text-primary">Укажите место на карте:</span>
+                        <yandex-map
+                            class="content__map_body"
+                            :width="'816px'"
+                            :height="'100%'"
+                            :clickable="true"
+                            @map-clicked="addPlacemark"
+                            ref="map"
+                        >
+                        </yandex-map>
                     </div>
-                </section>
+                </div>
             </div>
         </main>
     </main-layout>
@@ -77,7 +73,6 @@
         data() {
             return {
                 place: {
-                    id: null,
                     name: '',
                     address: '',
                     averageCheck: 0,
@@ -85,24 +80,26 @@
                         id: null,
                         name: ''
                     },
-                    coords: []
+                    image: '',
+                    lat: 0,
+                    lon: 0,
+                    reviews: []
                 }
             }
         },
         computed: {
             ...mapGetters([
-                'categories',
-                'getNewPlaceId'
+                'categories'
             ])
         },
         methods: {
             createPlace() {
-                this.place.id = this.getNewPlaceId;
-                this.$store.dispatch('createPlace', this.place);
-                this.$router.push('/');
+                this.$store.dispatch('createPlace', { newPlace: this.place, router: this.$router });
             },
             addPlacemark(coords) {
-                this.place.coords = coords;
+                this.place.lat = coords[0];
+                this.place.lon = coords[1];
+
                 this.$refs.map.clearMap();
                 this.$refs.map.addPlacemark(this.place);
             }

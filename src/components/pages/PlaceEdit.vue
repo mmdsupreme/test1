@@ -37,14 +37,12 @@
                             </select>
 
                             <label class="text-primary" for="photo">Фото:</label>
-                            <input type="text" name="photo_url"
-                                   value="http://img.all-mods.ru/2016/04/skyrim-bolshe-markerov-d"
-                                   disabled>
+                            <input v-model="place && place.image" type="text" name="photo_url">
                             <input type="file" name="photo" id="photo" accept="image/*">
 
-                            <img src="../../assets/images/photo.jpeg">
+                            <img :src="place && place.image">
 
-                            <button class="text-primary" type="submit" @click.prevent="savePlace">Сохранить</button>
+                            <button class="text-primary" type="submit" @click.prevent="updatePlace">Сохранить</button>
                         </form>
                         <div class="content__map">
                             <span class="content__map_title text-primary">Укажите место на карте:</span>
@@ -53,7 +51,7 @@
                                     :width="'816px'"
                                     :height="'100%'"
                                     :places="[place]"
-                                    :center="place.coords"
+                                    :center="place && [place.lat, place.lon]"
                                     :zoom="15"
                                 >
                                 </yandex-map>
@@ -85,8 +83,8 @@
             }
         },
         methods: {
-            savePlace() {
-                this.$router.push('/');
+            updatePlace() {
+                this.$store.dispatch('updatePlace', { place: this.place, router: this.$router });
             }
         }
     }

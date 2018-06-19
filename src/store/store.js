@@ -1,32 +1,27 @@
 import Vue from 'vue/dist/vue';
 import Vuex from 'vuex';
-import places from '../assets/places';
-import categories from '../assets/categories';
 import map from './modules/map';
+import api from './modules/api';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
     modules: {
-        map
+        map,
+        api
     },
     state: {
-        scholarship: 3000,
-        places,
-        categories
-    },
-    actions: {
-        setScholarship(context, scholarship) {
-            context.commit('setScholarship', scholarship);
-        },
-        createPlace(context, place) {
-            context.commit('createPlace', place);
-        },
-        deletePlaceById(context, id) {
-            context.commit('deletePlaceById', id);
-        }
+        scholarship: 10000,
+        places: [],
+        categories: []
     },
     mutations: {
+        setPlaces(state, places) {
+            state.places = places;
+        },
+        setCategories(state, categories) {
+            state.categories = categories;
+        },
         setScholarship(state, scholarship) {
             state.scholarship = scholarship;
         },
@@ -35,7 +30,10 @@ export default new Vuex.Store({
         },
         deletePlaceById(state, id) {
             state.places = state.places.filter(place => place.id != id);
-        }
+        },
+        createReview(state, { review, place }) {
+            place.reviews.push(review);
+        },
     },
     getters: {
         scholarship: state => {
@@ -72,11 +70,6 @@ export default new Vuex.Store({
         },
         getPlaceReviewNumber: state => place => {
             return place && place.review ? place.review.length : 0;
-        },
-        getNewPlaceId: (state, getters) => {
-            let maxPlaceId = Math.max(...getters.places.map(place => place.id), 0);
-
-            return ++maxPlaceId;
         }
     }
 });
